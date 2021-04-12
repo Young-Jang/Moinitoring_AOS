@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 
 import org.json.JSONArray;
@@ -27,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private static ArrayList<SMSData> SMSDataList;
     private static final String TAG = "MainActivity";
     private static final String SETTINGS_PLAYER_JSON = "settings_item_json";
+    static Boolean imsi = false;
+    Button resetButton;
     ListView listView;
     SMSAdapter myAdapter;
 
@@ -38,6 +42,16 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG,"start");
         SMSDataList = new ArrayList<SMSData>();
+        resetButton = (Button)findViewById(R.id.button);
+
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetPreferences(getApplicationContext(),SETTINGS_PLAYER_JSON);
+                getStringArrayPref(getApplicationContext(),SETTINGS_PLAYER_JSON);
+                SMSDataList.clear();
+            }
+        });
 
         Intent intent = getIntent();
         processCommand(intent);
@@ -125,6 +139,15 @@ public class MainActivity extends AppCompatActivity {
         myAdapter = new SMSAdapter(this,SMSDataList);
 
         listView.setAdapter(myAdapter);
+    }
+
+    private void resetPreferences(Context context, String key){
+        Log.d(TAG,"memory reset start");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        JSONArray a = new JSONArray();
+        editor.putString(key, null);
+        editor.apply();
     }
 
     private void requirePerms(){
