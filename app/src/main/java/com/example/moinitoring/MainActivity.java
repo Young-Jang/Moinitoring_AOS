@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.SmsMessage;
@@ -22,6 +23,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,6 +58,16 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         processCommand(intent);
+
+        /*
+        * spring 서버 통신 시작*/
+        NetworkTask2 networkTask = new NetworkTask2();
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("title","request all user profile from android");
+
+        networkTask.execute(params);
+
     }
 
     @Override
@@ -157,4 +170,35 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, permissions, 1);
         }
     }
+
+    public class NetworkTask2 extends AsyncTask<Map<String, String>, Integer, String> {
+        @Override
+        protected String doInBackground(Map<String, String>... maps) { // 내가 전송하고 싶은 파라미터
+
+        // Http 요청 준비 작업
+            HttpClient.Builder http = new HttpClient.Builder("POST", "http://192.168.1.172:5000/allUser");
+
+        // Parameter 를 전송한다.
+            http.addAllParameters(maps[0]);
+
+
+        //Http 요청 전송
+            HttpClient post = http.create();
+            post.request();
+
+        // 응답 상태코드 가져오기
+            int statusCode = post.getHttpStatusCode();
+
+        // 응답 본문 가져오기
+            String body = post.getBody();
+
+            return body;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            Log.d("JSON_RESULT: ",s);
+        }
+    }
+
 }
