@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(Map<String, String>... maps) { // 내가 전송하고 싶은 파라미터
 
         // Http 요청 준비 작업
-            HttpClient.Builder http = new HttpClient.Builder("POST", "http://192.168.1.172:5000/allUser");
+            HttpClient.Builder http = new HttpClient.Builder("POST", "http://10.0.2.2:5000/allUser");
 
         // Parameter 를 전송한다.
             http.addAllParameters(maps[0]);
