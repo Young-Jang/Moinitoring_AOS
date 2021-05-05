@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -31,10 +32,23 @@ public class RegisterActivity extends AppCompatActivity {
         join_pwck = findViewById(R.id.join_pwck);
 
         check_button = findViewById(R.id.check_button);
+
+
         check_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*
+                 * spring 서버 통신 시작*/
+                ValidateId networkTask = new ValidateId();
 
+                Map<String, String> params = new HashMap<String, String>();
+
+                Log.d("parmas","id: "+join_email.getText().toString()+"  name: "+join_name.getText().toString()+ "   password: "+join_password.getText().toString());
+                params.put("id",join_email.getText().toString());
+                params.put("name",join_name.getText().toString());
+                params.put("password",join_password.getText().toString());
+                Log.d("parmas","id: "+params.get("id")+" name: "+params.get("name")+" password: "+params.get("password"));
+                networkTask.execute(params);
             }
         });
     }
@@ -44,7 +58,7 @@ public class RegisterActivity extends AppCompatActivity {
         protected String doInBackground(Map<String, String>... maps) { // 내가 전송하고 싶은 파라미터
 
             // Http 요청 준비 작업
-            HttpClient.Builder http = new HttpClient.Builder("POST", "http://10.0.2.2:5000/availableId");
+            HttpClient.Builder http = new HttpClient.Builder("POST", "http://10.0.2.2:5000/user/register");
 
             // Parameter 를 전송한다.
             http.addAllParameters(maps[0]);

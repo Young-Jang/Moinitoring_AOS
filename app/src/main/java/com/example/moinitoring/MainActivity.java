@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String SETTINGS_PLAYER_JSON = "settings_item_json";
     static Boolean imsi = false;
-    Button resetButton;
+    Button resetButton, registerButton;
     ListView listView;
     SMSAdapter myAdapter;
 
@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG,"start");
         SMSDataList = new ArrayList<SMSData>();
         resetButton = (Button)findViewById(R.id.button);
+        registerButton = (Button)findViewById(R.id.register);
 
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,6 +54,16 @@ public class MainActivity extends AppCompatActivity {
                 resetPreferences(getApplicationContext(),SETTINGS_PLAYER_JSON);
                 getStringArrayPref(getApplicationContext(),SETTINGS_PLAYER_JSON);
                 SMSDataList.clear();
+            }
+        });
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("move activity","to RegisterAc");
+                Intent intent = new Intent(getApplicationContext(),RegisterActivity.class);
+                startActivity(intent);
+                Log.d("move activity","to RegisterAc success");
             }
         });
 
