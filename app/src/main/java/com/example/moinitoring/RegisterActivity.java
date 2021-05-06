@@ -18,7 +18,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText join_email, join_password, join_name, join_pwck;
     private Button join_button, check_button;
     private AlertDialog dialog;
-    private boolean validate = false;
+    private static boolean validate = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,23 +37,66 @@ public class RegisterActivity extends AppCompatActivity {
         check_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*
-                 * spring 서버 통신 시작*/
-                ValidateId networkTask = new ValidateId();
 
+                ValidateId validateId = new ValidateId();
                 Map<String, String> params = new HashMap<String, String>();
 
-                Log.d("parmas","id: "+join_email.getText().toString()+"  name: "+join_name.getText().toString()+ "   password: "+join_password.getText().toString());
                 params.put("id",join_email.getText().toString());
-                params.put("name",join_name.getText().toString());
-                params.put("password",join_password.getText().toString());
-                Log.d("parmas","id: "+params.get("id")+" name: "+params.get("name")+" password: "+params.get("password"));
-                networkTask.execute(params);
+
+                validateId.execute(params);
             }
         });
     }
 
     public class ValidateId extends AsyncTask<Map<String, String>, Integer, String> {
+        @Override
+        protected String doInBackground(Map<String, String>... maps) { // 내가 전송하고 싶은 파라미터
+
+            // Http 요청 준비 작업
+            HttpClient.Builder http = new HttpClient.Builder("POST", "http://10.0.2.2:5000/user/availableId");
+
+            // Parameter 를 전송한다.
+            http.addAllParameters(maps[0]);
+
+            //Http 요청 전송
+            HttpClient post = http.create();
+            post.request();
+
+            // 응답 상태코드 가져오기
+            int statusCode = post.getHttpStatusCode();
+
+            // 응답 본문 가져오기
+            String body = post.getBody();
+
+            return body;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            Log.d("JSON_RESULT: ",s);
+            int cnt = Integer.parseInt(s);
+            if(cnt==0)
+            {
+                Map<String, String> params = new HashMap<String, String>();
+
+                params.put("id",join_email.getText().toString());
+                /*
+                 * spring 서버 통신 시작*/
+                Register networkTask = new Register();
+
+                Log.d("parmas","id: "+join_email.getText().toString()+"  name: "+join_name.getText().toString()+ "   password: "+join_password.getText().toString());
+                params.put("name",join_name.getText().toString());
+                params.put("password",join_password.getText().toString());
+                Log.d("parmas","id: "+params.get("id")+" name: "+params.get("name")+" password: "+params.get("password"));
+                networkTask.execute(params);
+            }
+            else
+                validate = true;
+        }
+    }
+
+
+    public class Register extends AsyncTask<Map<String, String>, Integer, String> {
         @Override
         protected String doInBackground(Map<String, String>... maps) { // 내가 전송하고 싶은 파라미터
 
