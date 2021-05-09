@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String SETTINGS_PLAYER_JSON = "settings_item_json";
     static Boolean imsi = false;
-    Button resetButton, registerButton;
+    Button resetButton, loginButton;
     ListView listView;
     SMSAdapter myAdapter;
 
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG,"start");
         SMSDataList = new ArrayList<SMSData>();
         resetButton = (Button)findViewById(R.id.button);
-        registerButton = (Button)findViewById(R.id.register);
+        loginButton = (Button)findViewById(R.id.login_button);
 
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,27 +57,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        registerButton.setOnClickListener(new View.OnClickListener() {
+        loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("move activity","to RegisterAc");
-                Intent intent = new Intent(getApplicationContext(),RegisterActivity.class);
+                Log.d("move activity","to Login");
+                Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
                 startActivity(intent);
-                Log.d("move activity","to RegisterAc success");
+                Log.d("move activity","to Login success");
             }
         });
 
         Intent intent = getIntent();
         processCommand(intent);
-
-        /*
-        * spring 서버 통신 시작*/
-        NetworkTask2 networkTask = new NetworkTask2();
-
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("title","request all user profile from android");
-
-        networkTask.execute(params);
 
     }
 

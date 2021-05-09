@@ -3,12 +3,15 @@ package com.example.moinitoring;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +19,7 @@ import java.util.Map;
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText join_email, join_password, join_name, join_pwck;
-    private Button join_button, check_button;
+    private Button join_button, check_button, cancel_button;
     private AlertDialog dialog;
     private static boolean validate = false;
 
@@ -32,7 +35,8 @@ public class RegisterActivity extends AppCompatActivity {
         join_pwck = findViewById(R.id.join_pwck);
 
         check_button = findViewById(R.id.check_button);
-
+        join_button = findViewById(R.id.join_button);
+        cancel_button = findViewById(R.id.delete);
 
         check_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,6 +48,42 @@ public class RegisterActivity extends AppCompatActivity {
                 params.put("id",join_email.getText().toString());
 
                 validateId.execute(params);
+            }
+        });
+
+        join_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(validate)
+                {
+                    Map<String, String> params = new HashMap<String, String>();
+
+                    params.put("id",join_email.getText().toString());
+                    /*
+                     * spring 서버 통신 시작*/
+                    Register networkTask = new Register();
+
+                    Log.d("parmas","id: "+join_email.getText().toString()+"  name: "+join_name.getText().toString()+ "   password: "+join_password.getText().toString());
+                    params.put("name",join_name.getText().toString());
+                    params.put("password",join_password.getText().toString());
+                    Log.d("parmas","id: "+params.get("id")+" name: "+params.get("name")+" password: "+params.get("password"));
+                    networkTask.execute(params);
+                    successDialog();
+                }
+                else
+                {
+                    Log.d("Login","계정 중복체크 미완료");
+                    Toast.makeText(RegisterActivity.this, "계정 중복체크를 해주세요.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        cancel_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("move activity","to Main");
+                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                startActivity(intent);
+                Log.d("move activity","to Main success");
             }
         });
     }
@@ -77,21 +117,11 @@ public class RegisterActivity extends AppCompatActivity {
             int cnt = Integer.parseInt(s);
             if(cnt==0)
             {
-                Map<String, String> params = new HashMap<String, String>();
-
-                params.put("id",join_email.getText().toString());
-                /*
-                 * spring 서버 통신 시작*/
-                Register networkTask = new Register();
-
-                Log.d("parmas","id: "+join_email.getText().toString()+"  name: "+join_name.getText().toString()+ "   password: "+join_password.getText().toString());
-                params.put("name",join_name.getText().toString());
-                params.put("password",join_password.getText().toString());
-                Log.d("parmas","id: "+params.get("id")+" name: "+params.get("name")+" password: "+params.get("password"));
-                networkTask.execute(params);
+                Toast.makeText(RegisterActivity.this, "사용가능 계정입니다.", Toast.LENGTH_SHORT).show();
+                validate = true;
             }
             else
-                validate = true;
+                Toast.makeText(RegisterActivity.this, "이미 사용중인 계정입니다.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -124,4 +154,25 @@ public class RegisterActivity extends AppCompatActivity {
             Log.d("JSON_RESULT: ",s);
         }
     }
+
+    void successDialog() {
+        AlertDialog.Builder msgBuilder = new AlertDialog.Builder(RegisterActivity.this)
+                .setTitle("회원가입 완") .setMessage("로그인 창으로 이동하시겠습니까?")
+                .setPositiveButton("네", new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface dialogInterface, int i) {
+                        Log.d("move activity","to RegisterPhone");
+                        Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
+                        startActivity(intent);
+                        Log.d("move activity","to RegisterPhone success");                    }
+                })
+                .setNegativeButton("아니요", new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface dialogInterface, int i) {
+                        Log.d("move activity","to Main");
+                        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                        startActivity(intent);
+                        Log.d("move activity","to Main success");
+                        //Toast.makeText(LoginActivity.this, "메인으로 이동", Toast.LENGTH_SHORT).show();
+                    }
+                });
+        AlertDialog msgDlg = msgBuilder.create(); msgDlg.show(); }
 }
